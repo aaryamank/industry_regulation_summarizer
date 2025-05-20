@@ -15,3 +15,4 @@ venv/
 Test_Code.ipynb
 app_test.ipynb
 .streamlit/secrets.toml
+.streamlit/secrets.toml
