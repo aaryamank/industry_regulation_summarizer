@@ -6,8 +6,3 @@ selenium
 webdriver-manager
 openai
 pandas
-datetime
-fitz
-time
-json
-re
