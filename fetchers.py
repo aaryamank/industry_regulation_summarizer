@@ -135,7 +135,10 @@ def scrape_rbi(cutoff_date):
     options.add_argument("--window-size=1920,1080")
 
     # service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(options=options)
+    
+    # ✅ Set paths for Streamlit Cloud
+    options.binary_location = "/usr/bin/chromium"
+    driver = webdriver.Chrome(executable_path="/usr/bin/chromedriver", options=options)
     driver.get("https://website.rbi.org.in/web/rbi/notifications?delta=100")
 
     # Scroll to load all content
