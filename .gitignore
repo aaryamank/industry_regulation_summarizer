@@ -1,0 +1,13 @@
+# Ignore Python & Streamlit environment files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+.venv/
+venv/
+*.env
+.DS_Store
+
+# Streamlit secrets
+.streamlit/secrets.toml
