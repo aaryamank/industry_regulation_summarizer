@@ -11,3 +11,7 @@ venv/
 
 # Streamlit secrets
 .streamlit/secrets.toml
+.ipynb_checkpoints/
+Test_Code.ipynb
+app_test.ipynb
+.streamlit/secrets.toml
