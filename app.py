@@ -49,7 +49,7 @@ def extract_text_from_pdf(url):
     #     return ""
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(pdf_url, headers=headers)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
 
         with open("temp.pdf", "wb") as f:
