@@ -24,15 +24,7 @@ Document title: {title}
 Text:
 {text}
 
-Please provide:
-1. A brief, suitable title for the summary.
-2. A concise summary in 3–7 bullet points.
-3. A list of potentially impacted sectors.
-
-Respond in the following format:
-
-### Title
-<Generated title>
+Please summarize the key takeaways into 3-7 bullet points, and list potentially impacted sectors. Format:
 
 ### Summary
 - point 1
@@ -51,6 +43,12 @@ Respond in the following format:
 
 # === UTILS ===
 def extract_text_from_pdf(url):
+    # try:
+    #     response = requests.get(url)
+    #     with fitz.open(stream=BytesIO(response.content), filetype="pdf") as doc:
+    #         return "\n".join(page.get_text() for page in doc)
+    # except Exception as e:
+    #     return ""
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
         response = requests.get(url, headers=headers)
@@ -73,8 +71,8 @@ def extract_text_from_pdf(url):
 
 # === MAIN ===
 st.set_page_config(page_title="India Regulatory Summary", page_icon="🇮🇳", layout="wide")
-st.title("India Ministry-specific Regulation Notifications Summarizer App")
-st.markdown("Summarized view of regulatory circulars issued by different Indian ministries")
+st.title("India Regulatory Summary App")
+st.markdown("Summarized view of regulatory circulars from Indian ministries")
 
 with st.spinner("Fetching and processing documents..."):
     dpiit_docs = scrape_dpiit(cutoff_date)
@@ -82,48 +80,35 @@ with st.spinner("Fetching and processing documents..."):
     rbi_docs = scrape_rbi(cutoff_date)
     commerce_docs = scrape_commerce(cutoff_date)
 
-    all_sources = {
-        "DPIIT": dpiit_docs,
-        "Ministry of Power": powermin_docs,
-        "RBI": rbi_docs,
-        "Ministry of Commerce": commerce_docs
-    }
-
+    all_docs = dpiit_docs + powermin_docs + rbi_docs + commerce_docs
     summaries_by_ministry = {}
 
-    for ministry, docs in all_sources.items():
-        summaries_by_ministry[ministry] = []
-        for doc in docs:
-            source = doc['source'] if isinstance(doc, dict) else doc[0]
-            title = doc['title'] if isinstance(doc, dict) else doc[1]
-            url = doc['url'] if isinstance(doc, dict) else doc[2]
+    for doc in all_docs:
+        source = doc['source'] if isinstance(doc, dict) else doc[0]
+        title = doc['title'] if isinstance(doc, dict) else doc[1]
+        url = doc['url'] if isinstance(doc, dict) else doc[2]
 
-            text = extract_text_from_pdf(url)
-            if not text or not text.strip():
-                continue
+        if source not in summaries_by_ministry:
+            summaries_by_ministry[source] = []
 
-            summary_text = summarizer_agent(title, text)
-            # Split to get generated title if present
-            summary_lines = summary_text.strip().split("\n")
-            generated_title = summary_lines[1] if len(summary_lines) > 1 and summary_lines[0].startswith("### Title") else title
-            full_summary = "\n".join(summary_lines[2:]) if generated_title != title else summary_text
+        text = extract_text_from_pdf(url)
+        if not text or not text.strip():
+            continue
 
-            summaries_by_ministry[ministry].append({
-                "title": generated_title,
-                "summary": full_summary,
-                "url": url
-            })
+        summary = summarizer_agent(title, text)
+        summaries_by_ministry[source].append({
+            "title": title,
+            "summary": summary,
+            "url": url
+        })
 
 # === DISPLAY ===
 st.success("✅ Summaries generated!")
 
 for ministry, docs in summaries_by_ministry.items():
-    with st.expander(ministry):
-        if docs:
-            for doc in docs:
-                st.subheader(doc['title'])
-                st.markdown(doc['summary'])
-                st.markdown(f"[🔗 PDF Link]({doc['url']})")
-                st.markdown("---")
-        else:
-            st.markdown("*No regulations/acts/circulars released in the specified period.*")
+    st.header(ministry)
+    for doc in docs:
+        st.subheader(doc['title'])
+        st.markdown(doc['summary'])
+        st.markdown(f"[🔗 PDF Link]({doc['url']})")
+        st.markdown("---")
