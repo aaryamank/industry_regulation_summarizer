@@ -4,5 +4,5 @@ PyMuPDF
 beautifulsoup4
 selenium
 webdriver-manager
-openai
+openai>=1.3.0
 pandas

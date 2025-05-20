@@ -12,6 +12,8 @@ from fetchers import scrape_dpiit, scrape_powermin, scrape_rbi, scrape_commerce
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 cutoff_date = datetime.today() - timedelta(days=90)
 
+client = openai.OpenAI(api_key=openai.api_key)
+
 # === SUMMARIZER AGENT ===
 def summarizer_agent(title, text):
     prompt = f"""
@@ -32,12 +34,12 @@ Please summarize the key takeaways into 3-7 bullet points, and list potentially 
 - sector 1
 - sector 2
 """
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4.1-nano",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 # === UTILS ===
 def extract_text_from_pdf(url):
