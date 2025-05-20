@@ -90,7 +90,7 @@ with st.spinner("Fetching and processing documents..."):
             summaries_by_ministry[source] = []
 
         text = extract_text_from_pdf(url)
-        if not text.strip():
+        if not text or not text.strip():
             continue
 
         summary = summarizer_agent(title, text)
